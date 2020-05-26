@@ -10,17 +10,20 @@
 
 ---
 
+```js
+
 {
   id: INTEGER; // auto increments by database
   username: STRING; // not nullable , unique - 125 max chars
   password: STRING; // not nullable - 125 max chars
 }
-
+```
 
 #### Listings
 
 ---
 
+```js
 {
   id: INTEGER; // auto increments by database
   product_name: TEXT; // not nullable - 125 max chars
@@ -33,6 +36,7 @@
   created_at: TIMESTAMP; // defaults to now - no need to fill this out
   user_id: INTEGER; // references user id - the users id that created this listing!
 }
+```
 
 
 ## Endpoints
