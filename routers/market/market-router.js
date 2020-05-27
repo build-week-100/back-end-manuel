@@ -17,11 +17,11 @@ router.get('/:id', (req, res) => {
     const { id } = req.params;
 
     Listings.findBy({id})
-        .then(listing => {
+        .then(([listing]) => {
             if(listing) {
                 res.status(200).json({ data: listing })
             } else {
-                res.status(404).json({ message: "Listing with specified Id was not found." })
+                res.status(404).json({ message: "Listing with specified ID was not found." })
             }
         })
         .catch(error => {
@@ -34,11 +34,11 @@ router.get('/user/:id', (req, res) => {
     const { id } = req.params;
     
     Listings.findUserListings(id)
-        .then(listing => {
+        .then(([listing]) => {
             if(listing) {
                 res.status(200).json({ data: listing })
             } else {
-                res.status(404).json({ message: "Listing with specified ID was not found." })
+                res.status(404).json({ message: "Listing with specified User ID was not found." })
             }
         })
         .catch(error => {
