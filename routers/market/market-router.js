@@ -2,6 +2,8 @@ const router = require('express').Router();
 
 const Listings = require('./market-model');
 
+const Users = require('../auth/auth-model');
+
 router.get('/', (req, res) => {
     Listings.find()
         .then(listings => {
@@ -13,28 +15,11 @@ router.get('/', (req, res) => {
         })
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUser, (req, res) => {
     const { id } = req.params;
 
     Listings.findBy({id})
-        .then(listing => {
-            if(listing) {
-                res.status(200).json({ data: listing })
-            } else {
-                res.status(404).json({ message: "Listing with specified Id was not found." })
-            }
-        })
-        .catch(error => {
-            console.log({ error })
-            res.status(500).json({ message: error.message })
-        })
-})
-
-router.get('/user/:id', (req, res) => {
-    const { id } = req.params;
-    
-    Listings.findUserListings(id)
-        .then(listing => {
+        .then(([listing]) => {
             if(listing) {
                 res.status(200).json({ data: listing })
             } else {
@@ -47,16 +32,33 @@ router.get('/user/:id', (req, res) => {
         })
 })
 
-router.post('/user/:id', validateListing, (req, res) => {
+router.get('/user/:id', (req, res) => {
+    const { id } = req.params;
+    
+    Listings.findUserListings(id)
+        .then(([listing]) => {
+            if(listing) {
+                res.status(200).json({ data: listing })
+            } else {
+                res.status(404).json({ message: "Listing with specified User ID was not found." })
+            }
+        })
+        .catch(error => {
+            console.log({ error })
+            res.status(500).json({ message: error.message })
+        })
+})
+
+router.post('/user/:id', validateUser, validateListing, (req, res) => {
     const { product_name, product_category, product_description, product_quantity, product_price, country, market_name } = req.body;
     const { id } = req.params;
 
     Listings.add({ product_name, product_category, product_description, product_quantity, product_price, country, market_name }, id)
-        .then(newListing => {
+        .then(([newListing]) => {
             if(newListing) {
                 res.status(201).json({ data: newListing })
             } else {
-                res.status(404).json({ message: "Newly created listing was not be found." })
+                res.status(404).json({ message: "Newly created listing was not found." })
             }
         })
         .catch(error => {
@@ -70,11 +72,11 @@ router.put('/:id', validateListing, (req, res) => {
     const { id } = req.params;
 
     Listings.edit({ product_name, product_category, product_description, product_quantity, product_price, country, market_name }, id)
-        .then(updatedListing => {
+        .then(([updatedListing]) => {
             if(updatedListing) {
                 res.status(200).json({ data: updatedListing })
             } else {
-                res.status(404).json({ message: "Listing with specified Id was not found." })
+                res.status(404).json({ message: "Listing with specified ID was not found." })
             }
         })
         .catch(error => {
@@ -102,6 +104,23 @@ router.delete('/:id', (req, res) => {
 
 // Custom MiddleWare //
 
+function validateUser(req, res, next) {
+    const { id } = req.params;
+
+    Users.findById(id)
+        .then(user => {
+            if(user) {
+                next();
+            } else {
+                res.status(404).json({ message: "User with specified ID was not found." })
+            }
+        })
+        .catch(error => {
+            console.log({ error })
+            res.status(500).json({ message: error.message })
+        })
+}
+
 function validateListing(req, res, next) {
     const { product_name, product_category, product_quantity, product_price, country, market_name } = req.body;
 
@@ -113,7 +132,5 @@ function validateListing(req, res, next) {
         next()
     }
 }
-
-
 
 module.exports = router;
