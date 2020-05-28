@@ -32,13 +32,13 @@ router.get('/:id', validateUser, (req, res) => {
         })
 })
 
-router.get('/user/:id', (req, res) => {
+router.get('/user/:id', validateUser, (req, res) => {
     const { id } = req.params;
     
     Listings.findUserListings(id)
-        .then(([listing]) => {
-            if(listing) {
-                res.status(200).json({ data: listing })
+        .then(listings => {
+            if(listings) {
+                res.status(200).json({ data: listings })
             } else {
                 res.status(404).json({ message: "Listing with specified User ID was not found." })
             }
