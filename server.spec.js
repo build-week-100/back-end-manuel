@@ -147,7 +147,7 @@ describe('server', () => {
                 .set('Authorization', logged.body.token)
 
             expect(res.status).toBe(200)
-            expect(res.body.data.user_id).toBe(1)
+            expect(res.body.data.length).toBe(3)
         })
 
         it('should return http status 404 if user with id was not found', async() => {
@@ -160,7 +160,7 @@ describe('server', () => {
                 .set('Authorization', logged.body.token)
 
             expect(res.status).toBe(404)
-            expect(res.body).toEqual({ "message": "Listing with specified User ID was not found." })
+            expect(res.body).toEqual({ "message": "User with specified ID was not found." })
         })
     })
 
